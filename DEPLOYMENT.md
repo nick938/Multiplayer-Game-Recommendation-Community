@@ -8,7 +8,8 @@
 
 ```
 GitHub（单一代码库）
-      │  push main → GitHub Actions：单测 / typecheck / 构建 OpenNext 产物 → wrangler deploy
+      │  push main → Cloudflare Workers Builds：构建 OpenNext 产物 → wrangler deploy
+      │             （GitHub Actions 并行跑单测 / typecheck / 真实构建，只校验不部署）
       ▼
 Cloudflare Workers（Next.js 16 经 OpenNext 适配，静态资源走 Workers Assets）
       │  每条查询 = 一次 HTTPS 请求（@neondatabase/serverless HTTP SQL API）
@@ -35,35 +36,24 @@ Neon PostgreSQL（项目 green-breeze-49108960，us-east-1）
 
 ## 二、部署
 
-### 自动部署（GitHub Actions —— 主路径）
+### 自动部署（Cloudflare Workers Builds —— 主路径，2026-09-12 起）
 
-push 到 `main` 即自动部署：CI 依次跑 install → db embed → 推荐引擎单测 →
-全仓 typecheck → `build:worker`（OpenNext 构建，PR 上同样执行以验证真实部署物）
-→ `wrangler deploy`。所有检查绿了才部署；部署失败会在 GitHub Actions 显示
-红叉和日志。`concurrency` 保证同一分支的部署不并行。
+Worker 的 Git 存储库已连接 `nick938/Multiplayer-Game-Recommendation-Community`
+（Worker → 设置 → 构建配置），push 到 `main` 即自动部署。构建环境自带账号认证，
+**不需要任何 API Token / secret**。构建配置（monorepo，三处都别用默认值）：
 
-需要两个仓库 secret（GitHub 仓库 Settings → Secrets and variables → Actions）：
-
-| Secret | 值 | 状态 |
+| 字段 | 值 | 说明 |
 |---|---|---|
-| `CLOUDFLARE_ACCOUNT_ID` | `92b495890da98068a5b5f4c3703fe2fb` | 已配置 |
-| `CLOUDFLARE_API_TOKEN` | 按下面步骤创建 | **待配置** |
+| 根目录 | `/` | pnpm workspace 根，含 `pnpm-lock.yaml` |
+| 构建命令 | `pnpm --filter @mgc/web build:worker` | `next build` 产物不是 Worker；必须走 OpenNext 构建（`.open-next/worker.js`） |
+| 部署命令 | `npx wrangler deploy --config apps/web/wrangler.jsonc` | `wrangler.jsonc` 在 `apps/web/` 下，根目录直接 `wrangler deploy` 找不到配置 |
+| 版本命令 | `npx wrangler versions upload --config apps/web/wrangler.jsonc` | 非生产分支构建用；留空则非生产分支只构建不上传 |
+| 生产分支 | `main` | |
 
-API Token 创建（一次性）：
-
-1. 打开 <https://dash.cloudflare.com/profile/api-tokens> → 创建令牌 →
-   使用模板「**编辑 Cloudflare Workers**」。
-2. 在权限列表中**追加一条：Zone → DNS → Edit**（区域选 `sololeveling.top`；
-   自定义域名 `routes.custom_domain` 的路由/证书管理需要它，模板默认不含）。
-3. 创建并复制 token，写入仓库 secret：
-
-   ```sh
-   gh secret set CLOUDFLARE_API_TOKEN -R nick938/Multiplayer-Game-Recommendation-Community
-   ```
-
-> 未配置 `CLOUDFLARE_API_TOKEN` 时，部署步骤以 warning 跳过（CI 仍绿）。
-> 配置后：下一次 push 自动部署，或在 Actions 页点 **Run workflow**（也可以
-> `gh workflow run ci.yml`）手动触发。
+职责划分：**Workers Builds 只负责部署，不跑测试**。单测 / typecheck / 真实构建
+（`build:worker`）由 GitHub Actions（`.github/workflows/ci.yml`）在每次 push / PR
+并行校验——测试红了看 Actions，部署红了看 Workers 构建日志（Worker → 部署 → 构建）。
+所以合并前看一眼 Actions 绿不绿，是这套流程的人工门禁。
 
 ### 手动部署（等价命令 / 应急）
 

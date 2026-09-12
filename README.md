@@ -99,9 +99,10 @@ packages/auth            Better Auth（邮箱密码；Google/Discord 按环境�
 
 ## 部署
 
-**自动**：push 到 `main` → GitHub Actions 跑单测 / typecheck / OpenNext 构建后自动
-`wrangler deploy` 到 Cloudflare Workers（API Token 一次性配置见
-**[DEPLOYMENT.md](DEPLOYMENT.md)**「自动部署」）。
+**自动**：push 到 `main` → Cloudflare Workers Builds（Git 集成）自动构建 OpenNext
+产物并 `wrangler deploy`，无需 API Token；GitHub Actions 并行跑单测 / typecheck /
+真实构建做校验（合并前确认 Actions 绿）。构建配置见 **[DEPLOYMENT.md](DEPLOYMENT.md)**
+「自动部署」。
 
 ```sh
 cd apps/web
