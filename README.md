@@ -2,7 +2,8 @@
 
 > 一个帮助朋友、小队、情侣、家庭，根据**人数、平台、偏好**找到真正适合一起玩的联机游戏的平台。
 > 依据 `multiplayer-game-community-project-plan.md`（下称"计划书"）实现。
-> **已上线**：https://coopfinder.liuyi4781.workers.dev （Cloudflare Workers + Neon PostgreSQL）
+> **已上线**：https://coopfinder.sololeveling.top （Cloudflare Workers + Neon PostgreSQL，
+> 备用 https://coopfinder.liuyi4781.workers.dev ）
 
 ## 已实现范围（对应计划书）
 
@@ -92,8 +93,9 @@ packages/auth            Better Auth（邮箱密码；Google/Discord 按环境�
 2. 游戏扩充到计划书目标 300–500 款。
 3. CN 版：Cloudflare 单部署路线下无国内接入商、走不了 ICP 备案——**无备案灰区运营，
    `features.ugc` 保持关闭**；`DEPLOYMENT_TARGET=cn` 构建开关仍可用（仅语言/URL 差异）。
-4. 自定义域名：阿里云购买域名 → NS 切到 Cloudflare → Worker 绑定 Custom Domain
-   （顺带解决 workers.dev 国内阻断；详见 DEPLOYMENT.md「后置事项」）。
+4. 自定义域名：已完成（2026-09-12）——`coopfinder.sololeveling.top` 已绑定 Worker；
+   阿里云仅当注册商，NS 托管 Cloudflare。国内访问仍走 Cloudflare 跨境链路（详见
+   DEPLOYMENT.md「后置事项」）。
 
 ## 部署
 

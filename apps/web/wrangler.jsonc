@@ -12,9 +12,19 @@
   // 数据库：Neon PostgreSQL。连接串经 `wrangler secret put DATABASE_URL` 配置
   // （Neon pooled 连接串），Workers 上查询走 @neondatabase/serverless 的
   // HTTP SQL API —— workerd 的 socket 不能跨请求复用，连接池方案必挂。
+  // 自定义域名：zone sololeveling.top 已托管在 Cloudflare（阿里云注册、NS 已切）。
+  // custom_domain 会自动创建 DNS 记录并签发证书；workers.dev 域名保持不变。
+  "routes": [
+    {
+      "pattern": "coopfinder.sololeveling.top",
+      "custom_domain": true
+    }
+  ],
   "vars": {
     "DEPLOYMENT_TARGET": "global"
   },
+  // 显式保留 workers.dev 地址作为备用入口（加了 routes 后 wrangler 默认会关掉它）
+  "workers_dev": true,
   "observability": {
     "enabled": true
   }

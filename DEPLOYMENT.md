@@ -1,6 +1,7 @@
 # 部署方案（Cloudflare Workers，已上线）
 
-> 状态：**已上线** — https://coopfinder.liuyi4781.workers.dev
+> 状态：**已上线** — https://coopfinder.sololeveling.top （主地址，Cloudflare 自定义域名）
+> 备用：https://coopfinder.liuyi4781.workers.dev （workers.dev，wrangler.jsonc `workers_dev: true` 保留）
 > 部署决策（2026-09-12）：**只部署到 Cloudflare Workers**，不用 Vercel，不用阿里云。
 > 仓库只保留这一条部署路径；国际版/国内版差异由 `DEPLOYMENT_TARGET` 构建开关控制，
 > 与托管平台无关。
@@ -96,8 +97,11 @@ PGlite 仅限本地/Node 环境（serverless 运行时上无持久化，代码�
 
 ## 五、后置事项
 
-- [ ] **自定义域名**：阿里云购买域名（实名即可，无需备案）→ 域名 NS 切到 Cloudflare →
-      Worker 的 Custom Domains 绑定。顺带解决 workers.dev 在国内被阻断的问题。
+- [x] **自定义域名（2026-09-12 完成）**：`sololeveling.top` 阿里云注册（当日购买）→
+      NS 已切 Cloudflare（samara/peyton.ns.cloudflare.com，zone 激活）→ Worker 绑定
+      `coopfinder.sololeveling.top`（wrangler.jsonc `routes.custom_domain`，DNS 记录与
+      证书自动签发）。注意：加 routes 后 wrangler 默认**关闭 workers.dev 路由**，
+      已用 `workers_dev: true` 显式保留备用入口。
       注意：Cloudflare 免费版无中国大陆节点，国内访问走跨境链路，延迟 200–400ms 属预期；
       该路线为无备案灰区，`features.ugc` 必须保持关闭。
 - [ ] 种子数据人工复核（41 款 crossplay 矩阵，`confidence=editor`，核验日期 2026-09-01）。
