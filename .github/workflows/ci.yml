@@ -5,9 +5,16 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -28,6 +35,17 @@ jobs:
 
       - run: pnpm -r typecheck
 
-      - run: pnpm --filter @mgc/web build
+      # 构建 OpenNext Worker 产物（.open-next/）——PR 上也走这条真实部署物路径
+      - run: pnpm --filter @mgc/web build:worker
         env:
           DEPLOYMENT_TARGET: global
+
+      # push 到 main = 自动部署到 Cloudflare Workers
+      - name: Deploy to Cloudflare Workers
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.CLOUDFLARE_API_TOKEN != ''
+        working-directory: apps/web
+        run: npx wrangler deploy
+
+      - name: Deploy skipped (CLOUDFLARE_API_TOKEN 未配置)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.CLOUDFLARE_API_TOKEN == ''
+        run: echo "::warning::仓库 secret 里还没有 CLOUDFLARE_API_TOKEN，本次跳过部署；配置后的下一次 push 自动部署。见 DEPLOYMENT.md「自动部署」。"

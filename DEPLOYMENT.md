@@ -8,10 +8,8 @@
 
 ```
 GitHub（单一代码库）
-      │  main 分支
+      │  push main → GitHub Actions：单测 / typecheck / 构建 OpenNext 产物 → wrangler deploy
       ▼
-pnpm deploy:worker（opennextjs-cloudflare build + deploy）
-      │
 Cloudflare Workers（Next.js 16 经 OpenNext 适配，静态资源走 Workers Assets）
       │  每条查询 = 一次 HTTPS 请求（@neondatabase/serverless HTTP SQL API）
       ▼
@@ -35,7 +33,38 @@ Neon PostgreSQL（项目 green-breeze-49108960，us-east-1）
 | 数据库 | Neon | PostgreSQL，us-east-1 | 免费档起步 |
 | 域名 | （后置）阿里云购买 → DNS 托管 Cloudflare | 自定义域名 + 绕开 workers.dev 国内阻断 | ~¥60/年 |
 
-## 二、部署步骤（全量）
+## 二、部署
+
+### 自动部署（GitHub Actions —— 主路径）
+
+push 到 `main` 即自动部署：CI 依次跑 install → db embed → 推荐引擎单测 →
+全仓 typecheck → `build:worker`（OpenNext 构建，PR 上同样执行以验证真实部署物）
+→ `wrangler deploy`。所有检查绿了才部署；部署失败会在 GitHub Actions 显示
+红叉和日志。`concurrency` 保证同一分支的部署不并行。
+
+需要两个仓库 secret（GitHub 仓库 Settings → Secrets and variables → Actions）：
+
+| Secret | 值 | 状态 |
+|---|---|---|
+| `CLOUDFLARE_ACCOUNT_ID` | `92b495890da98068a5b5f4c3703fe2fb` | 已配置 |
+| `CLOUDFLARE_API_TOKEN` | 按下面步骤创建 | **待配置** |
+
+API Token 创建（一次性）：
+
+1. 打开 <https://dash.cloudflare.com/profile/api-tokens> → 创建令牌 →
+   使用模板「**编辑 Cloudflare Workers**」。
+2. 在权限列表中**追加一条：Zone → DNS → Edit**（区域选 `sololeveling.top`；
+   自定义域名 `routes.custom_domain` 的路由/证书管理需要它，模板默认不含）。
+3. 创建并复制 token，写入仓库 secret：
+
+   ```sh
+   gh secret set CLOUDFLARE_API_TOKEN -R nick938/Multiplayer-Game-Recommendation-Community
+   ```
+
+> 未配置 `CLOUDFLARE_API_TOKEN` 时，部署步骤以 warning 跳过（CI 仍绿），
+> 配置后的下一次 push 自动开始部署。
+
+### 手动部署（等价命令 / 应急）
 
 前置：`wrangler login`（当前账号 liuyi4781@gmail.com）。账号下另有 Naddod 团队账号，
 **非交互部署必须显式指定 `CLOUDFLARE_ACCOUNT_ID=92b495890da98068a5b5f4c3703fe2fb`**。

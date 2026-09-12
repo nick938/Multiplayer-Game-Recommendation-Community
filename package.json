@@ -13,6 +13,8 @@
   "scripts": {
     "dev": "pnpm --filter @mgc/web dev",
     "build": "pnpm --filter @mgc/web build",
+    "build:worker": "pnpm --filter @mgc/web build:worker",
+    "deploy:worker": "pnpm --filter @mgc/web deploy:worker",
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
     "db:generate": "pnpm --filter @mgc/db generate",

@@ -99,12 +99,13 @@ packages/auth            Better Auth（邮箱密码；Google/Discord 按环境�
 
 ## 部署
 
-完整部署方案与 runbook 见 **[DEPLOYMENT.md](DEPLOYMENT.md)**（Cloudflare Workers + Neon，
-secrets 配置、数据库操作、验证清单、坑与约束）。
+**自动**：push 到 `main` → GitHub Actions 跑单测 / typecheck / OpenNext 构建后自动
+`wrangler deploy` 到 Cloudflare Workers（API Token 一次性配置见
+**[DEPLOYMENT.md](DEPLOYMENT.md)**「自动部署」）。
 
 ```sh
 cd apps/web
-CLOUDFLARE_ACCOUNT_ID=<账号ID> pnpm deploy:worker   # 构建 + 部署到 Cloudflare Workers
+CLOUDFLARE_ACCOUNT_ID=<账号ID> pnpm deploy:worker   # 手动应急：构建 + 部署
 ```
 
 环境变量见 `.env.example`。本地零配置即可跑通；社交媒体登录、短信等仅在相应密钥存在时启用。
