@@ -1,0 +1,5 @@
+export { checkCompatibility, type CompatibilityInput, type CompatibilityResult } from './compatibility'
+export { hardFilter, type FilterFailure, type FilterOutcome } from './filters'
+export { scoreGame, weightedTotal, WEIGHTS, type ScorePart } from './score'
+export { buildReasons } from './reasons'
+export { recommend, type RecommendOptions, type RecommendOutput } from './recommend'

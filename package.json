@@ -1,0 +1,25 @@
+{
+  "name": "mgc-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.34.5",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd",
+      "@cloudflare/workerd-windows",
+      "sharp"
+    ]
+  },
+  "scripts": {
+    "dev": "pnpm --filter @mgc/web dev",
+    "build": "pnpm --filter @mgc/web build",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "db:generate": "pnpm --filter @mgc/db generate",
+    "db:embed": "pnpm --filter @mgc/db embed",
+    "db:seed": "pnpm --filter @mgc/db seed"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

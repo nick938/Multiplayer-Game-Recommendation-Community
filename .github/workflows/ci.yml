@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        # reads the version from packageManager in package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @mgc/db embed
+
+      # 推荐引擎单测（平台兼容矩阵是核心资产，必须每次验证）
+      - run: pnpm --filter @mgc/recommendation test
+
+      - run: pnpm -r typecheck
+
+      - run: pnpm --filter @mgc/web build
+        env:
+          DEPLOYMENT_TARGET: global

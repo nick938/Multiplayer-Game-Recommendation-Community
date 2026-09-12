@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.next/
+out/
+.open-next/
+.wrangler/
+.pglite-data/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.DS_Store
+coverage/
+.vercel/
+.vercel
+.dev.vars

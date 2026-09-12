@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // 联机游戏推荐社区 — Cloudflare Workers 部署（OpenNext 适配，计划书 §53 的 Cloudflare 实现）
+  "name": "coopfinder",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // 数据库：Neon PostgreSQL。连接串经 `wrangler secret put DATABASE_URL` 配置
+  // （Neon pooled 连接串），Workers 上查询走 @neondatabase/serverless 的
+  // HTTP SQL API —— workerd 的 socket 不能跨请求复用，连接池方案必挂。
+  "vars": {
+    "DEPLOYMENT_TARGET": "global"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@mgc/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "generate": "drizzle-kit generate",
+    "embed": "node scripts/embed-migrations.mjs",
+    "seed": "tsx src/seed/main.ts"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@mgc/domain": "workspace:*",
+    "@neondatabase/serverless": "^1.1.0",
+    "@opennextjs/cloudflare": "^1.20.6",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.9"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.2"
+  }
+}
