@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch: # 允许在 Actions 页手动触发（配置好 token 后可直接触发首次部署）
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -40,12 +41,12 @@ jobs:
         env:
           DEPLOYMENT_TARGET: global
 
-      # push 到 main = 自动部署到 Cloudflare Workers
+      # push / 手动触发（workflow_dispatch）到 main = 自动部署到 Cloudflare Workers
       - name: Deploy to Cloudflare Workers
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.CLOUDFLARE_API_TOKEN != ''
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && env.CLOUDFLARE_API_TOKEN != ''
         working-directory: apps/web
         run: npx wrangler deploy
 
       - name: Deploy skipped (CLOUDFLARE_API_TOKEN 未配置)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.CLOUDFLARE_API_TOKEN == ''
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && env.CLOUDFLARE_API_TOKEN == ''
         run: echo "::warning::仓库 secret 里还没有 CLOUDFLARE_API_TOKEN，本次跳过部署；配置后的下一次 push 自动部署。见 DEPLOYMENT.md「自动部署」。"

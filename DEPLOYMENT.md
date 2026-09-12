@@ -61,8 +61,9 @@ API Token 创建（一次性）：
    gh secret set CLOUDFLARE_API_TOKEN -R nick938/Multiplayer-Game-Recommendation-Community
    ```
 
-> 未配置 `CLOUDFLARE_API_TOKEN` 时，部署步骤以 warning 跳过（CI 仍绿），
-> 配置后的下一次 push 自动开始部署。
+> 未配置 `CLOUDFLARE_API_TOKEN` 时，部署步骤以 warning 跳过（CI 仍绿）。
+> 配置后：下一次 push 自动部署，或在 Actions 页点 **Run workflow**（也可以
+> `gh workflow run ci.yml`）手动触发。
 
 ### 手动部署（等价命令 / 应急）
 
