@@ -1,5 +1,10 @@
 # 部署方案（Cloudflare Workers，已上线）
 
+## 构建环境安全版本
+
+构建使用 Node.js `24.22.1`（根目录 `.node-version`，Cloudflare Workers Builds 和 GitHub Actions 共用）；Next.js `16.4.1`。升级后执行 `pnpm test`、`pnpm typecheck`、`pnpm build:worker`。
+
+
 > 状态：**已上线** — https://coopfinder.sololeveling.top （主地址，Cloudflare 自定义域名）
 > 备用：https://coopfinder.liuyi4781.workers.dev （workers.dev，wrangler.jsonc `workers_dev: true` 保留）
 > 部署决策（2026-09-12）：**只部署到 Cloudflare Workers**，不用 Vercel，不用阿里云。
